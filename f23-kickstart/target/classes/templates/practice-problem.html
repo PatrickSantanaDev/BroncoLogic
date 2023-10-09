@@ -1,0 +1,487 @@
+<!DOCTYPE HTML>
+<html xmlns:th="https://www.thymeleaf.org" th:debug="true">
+
+<head th:replace="fragments :: html_head"></head>
+
+<body class="d-flex flex-column min-vh-100 body">
+
+    <!-- NavBar -->
+    <div th:replace="fragments :: menu"></div>
+
+    <section style="margin-top: 5%;" class="py-3 text-center container">
+        <div class="row py-0">
+            <div class="col-6">
+                <div
+                    class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                    <div class="col p-4 d-flex flex-column position-static">
+
+                        <!-- Operators Box -->
+                        <h3 style="padding-bottom:8px" class="mb-0">Operators</h3>
+                        <div class="col">
+                            <div class="container-sm">
+                                <div class="row">
+                                    <div class="col" style="border-bottom: 2px solid black">
+                                        ^
+                                    </div>
+                                    <div class="col" style="border-bottom: 2px solid black">
+                                        v
+                                    </div>
+                                    <div class="col" style="border-bottom: 2px solid black">
+                                        ~ (&#172;)
+                                    </div>
+                                    <div class="col" style="border-bottom: 2px solid black">
+                                        -> (&#8594;)
+                                    </div>
+                                    <div class="col" style="border-bottom: 2px solid black">
+                                        <-> (&#10231;)
+                                    </div>
+                                    <div class="col" style="border-bottom: 2px solid black">
+                                        :. (&#x2234;)
+                                    </div>
+                                    <div class="col" style="border-bottom: 2px solid black">
+                                        ::
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        and
+                                    </div>
+                                    <div class="col">
+                                        or
+                                    </div>
+                                    <div class="col">
+                                        not
+                                    </div>
+                                    <div class="col">
+                                        if then
+                                    </div>
+                                    <div class="col">
+                                        if and only
+                                    </div>
+                                    <div class="col">
+                                        therefore
+                                    </div>
+                                    <div class="col">
+                                        logical equivalence
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problem types box -->
+            <div class="col">
+                <div
+                    class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                    <div class="col p-4 d-flex flex-column position-static">
+                        <h3 class="mb-0">Problem Types</h3>
+                        <div class="row">
+                            <div class="col">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">Logical</li>
+                                    <li class="list-group-item">Equivalence</li>
+                                </ul>
+                            </div>
+                            <div class="col">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">Consistency</li>
+                                    <li class="list-group-item">Validity</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    </section>
+
+    <!-- Input field -->
+    <section class="py-sm-0 text-center container">
+        <div class="row py-lg-5">
+            <div class="col">
+            </div>
+            <div class="col-6">
+                <form action="#" th:action="@{/}" th:object="${question}" method="post">
+                    <p>Enter a question: <input type="text" id="question" th:field="*{question}" /> <input type="submit"
+                            onclick="return validate()" value="Submit" /> <input type="reset" value="Reset" /></p>
+
+                </form>
+            </div>
+
+            <div class="col"></div>
+        </div>
+    </section>
+
+    <!-- Main Table -->
+    <main role="main" class="container">
+        <div class="row">
+            <div class="col-xl-auto mx-auto">
+                <!-- Putting tables into columns -->
+                <div class="row">
+                    <div class="col-sm">
+                        <!-- Center text in columns -->
+                        <table class="tablecenterheadCSS tablecenterCSS table caption-top">
+                            <caption>Inputs</caption>
+                            <thead>
+                                <!-- print the input chars -->
+                                <tr class="fill">
+                                    <th:block th:each="char : ${inputChars.toCharArray()}">
+                                        <th th:text="${char}"></th>
+                                    </th:block>
+                                </tr>
+                            </thead>
+                            <!-- print the input values -->
+                            <th:block th:each="i: ${#numbers.sequence(1, boxDepth)}">
+                                <tr class="tablecenterCSS">
+                                    <th:block th:each="j : ${#numbers.sequence(1, inputChars.length())}">
+                                        <td>
+                                            <div style="height:25px"
+                                                th:text="${prefilled.charAt( i * inputChars.length() - inputChars.length() + j - 1)}">
+                                            </div>
+                                        </td>
+                                    </th:block>
+                                </tr>
+                            </th:block>
+                        </table>
+                    </div>
+                    <div id="selections" style="display: block;" class="col-sm">
+                        <table class="tablecenterheadCSS dropdowntable table caption-top">
+                            <caption>Statement</caption>
+                            <thead>
+                                <tr class="fill">
+                                    <!-- print the input statement -->
+                                    <th:block th:each="pair: ${parsedQuestion.getResultList()}">
+                                        <th th:text="${pair.getValue0()}">
+                                    </th:block>
+                                </tr>
+                            </thead>
+                            <!-- print the test, use a switch to display this later -->
+
+                            <!-- print the select boxes -->
+                            <th:block th:each="i: ${#numbers.sequence(0, boxDepth -1)}">
+                                <tr class="tablecenterCSS">
+
+                                    <!-- print the question values -->
+                                    <th:block th:each="pair: ${parsedQuestion.getResultList()}">
+                                        <th:block th:if="${pair.getValue1().length() != 0}">
+                                            <td>
+                                                <div style="height:25px">
+                                                    <select th:id="${submit.getCount()}" class="selectTF">
+                                                        <option value=" "></option>
+                                                        <option value="T">T</option>
+                                                        <option value="F">F</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                        </th:block>
+                                        <th:block th:if="${pair.getValue1().length() == 0}">
+                                            <td>
+                                                <div style="height:25px"></div>
+                                            </td>
+                                        </th:block>
+                                    </th:block>
+                                </tr>
+                            </th:block>
+
+                        </table>
+                    </div>
+
+                    <div id="answers" style="display:none" class="col-sm">
+                        <table class="tablecenterheadCSS dropdowntable table caption-top">
+                            <caption>Answers</caption>
+                            <thead>
+                                <tr class="fill">
+                                    <!-- print the input statement -->
+                                    <th:block th:each="pair: ${parsedQuestion.getResultList()}">
+                                        <th th:text="${pair.getValue0()}">
+                                    </th:block>
+                                </tr>
+                            </thead>
+                            <!-- print the test, use a switch to display this later -->
+                            <th:block th:each="i: ${#numbers.sequence(0, boxDepth -1)}">
+                                <tr class="tablecenterCSS">
+
+                                    <!-- print the question values -->
+                                    <th:block th:each="pair: ${parsedQuestion.getResultList()}">
+                                        <th:block th:if="${pair.getValue1().length() != 0}">
+                                            <td>
+                                                <div style="height:25px" th:text="${pair.getValue1().charAt(i)}"></div>
+                                            </td>
+                                        </th:block>
+                                        <th:block th:if="${pair.getValue1().length() == 0}">
+                                            <td>
+                                                <div style="height:25px"></div>
+                                            </td>
+                                        </th:block>
+                                    </th:block>
+                                </tr>
+                            </th:block>
+                        </table>
+                    </div>
+                    <div class="col-sm-auto">
+                        <th:block th:if="${parsedQuestion.isConsistency()}">
+                            <table class="tablecenterheadCSS dropdowntable table caption-top">
+                                <caption>Consistency Test</caption>
+                                <thead>
+                                    <tr class="fill">
+                                        <th style="text-align: center" th:colspan="${inputChars.length()}">
+                                            Shows Consistency?
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <!-- print the select boxes -->
+                                <th:block th:each="i: ${#numbers.sequence(1, boxDepth)}">
+                                    <tr class="tablecenterCSS">
+                                        <td>
+                                            <div style="height:25px">
+                                                Set is:
+                                                <select th:id="'valid' + ${submit.getCount2()}"
+                                                    class="practiceDropdown">
+                                                    <option value="F"></option>
+                                                    <option value="T">Shows Consistent</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                            </table>
+                        </th:block>
+                    </div>
+                    <div class="col-sm-auto">
+                        <th:block th:if="${parsedQuestion.isArgument()}">
+                            <table class="tablecenterheadCSS dropdowntable table caption-top">
+                                <caption>Validity Test</caption>
+                                <thead>
+                                    <tr class="fill">
+                                        <th style="text-align: center" th:colspan="${inputChars.length()}">
+                                            Row Shows?
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <!-- print the select boxes -->
+                                <th:block th:each="i: ${#numbers.sequence(1, boxDepth)}">
+                                    <tr class="tablecenterCSS">
+                                        <td>
+                                            <div style="height:25px;">
+                                                Argument is:
+                                                <select th:id="'valid' + ${submit.getCount2()}"
+                                                    class="practiceDropdown">
+                                                    <option value="F"></option>
+                                                    <option value="T">Invalid</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                            </table>
+                        </th:block>
+                    </div>
+                    <div class="col-sm-auto">
+                        <th:block th:if="${parsedQuestion.isLogical()}">
+                            <table class="tablecenterheadCSS dropdowntable table caption-top">
+                                <caption>Logical Status</caption>
+                                <thead>
+                                    <tr class="fill">
+                                        <th style="text-align: center" th:colspan="${inputChars.length()}">
+                                            Row Shows?
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <!-- print the select boxes -->
+                                <th:block th:each="i: ${#numbers.sequence(1, boxDepth)}">
+                                    <tr class="tablecenterCSS">
+                                        <td>
+                                            <div style="height:25px;">
+                                                Statement is:
+                                                <select th:id="'valid' + ${submit.getCount2()}"
+                                                    class="practiceDropdown">
+                                                    <option value=" "></option>
+                                                    <option value="T">Not Tautology</option>
+                                                    <option value="F">Not Contradiction</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                            </table>
+                        </th:block>
+                    </div>
+                    <div class="col-sm-auto">
+                        <th:block th:if="${parsedQuestion.isEquivalence()}">
+                            <table class="tablecenterheadCSS dropdowntable table caption-top">
+                                <caption>Equivalence</caption>
+                                <thead>
+                                    <tr class="fill">
+                                        <th style="text-align: center" th:colspan="${inputChars.length()}">
+                                            Row Shows?
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <!-- print the select boxes -->
+                                <th:block th:each="i: ${#numbers.sequence(1, boxDepth)}">
+                                    <tr class="tablecenterCSS">
+                                        <td>
+                                            <div style="height:25px">
+                                                Pair is:
+                                                <select th:id="'valid' + ${submit.getCount2()}"
+                                                    class="practiceDropdown">
+                                                    <option value="F"></option>
+                                                    <option value="T">Not Equivalent</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                            </table>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom div containing buttons and final answer dropdown -->
+    <section class="py-3 text-center container">
+        <div style="display: inline;">
+            <button class="solution" style="margin-right: 30px;" onclick="myFunction()">Show Solution</button>
+            <button class="solution" style="margin-right:30px" onclick="grade()">Check</button>
+            <th:block th:if="${parsedQuestion.isLogical()}">
+                Statement is:
+                <select th:id="finalAnswer" class="practiceDropdown">
+                    <option value=" "></option>
+                    <option value="tautology">Tautology</option>
+                    <option value="contradiction">Contradiction</option>
+                    <option value="contingent">Contingent</option>
+                </select>
+            </th:block>
+            <th:block th:if="${parsedQuestion.isEquivalence()}">
+                Pair of statements is:
+                <select th:id="finalAnswer" class="practiceDropdown">
+                    <option value=" "></option>
+                    <option value="equivalent">Equivalent</option>
+                    <option value="not equivalent">Non-equivalent</option>
+                </select>
+            </th:block>
+            <th:block th:if="${parsedQuestion.isConsistency()}">
+                Set of statements is:
+                <select th:id="finalAnswer" class="practiceDropdown">
+                    <option value=" "></option>
+                    <option value="consistent">Consistent</option>
+                    <option value="not consistent">Inconsistent</option>
+                </select>
+            </th:block>
+            <th:block th:if="${parsedQuestion.isArgument()}">
+                Argument is:
+                <select th:id="finalAnswer" class="practiceDropdown">
+                    <option value=" "></option>
+                    <option value="valid">Valid</option>
+                    <option value="invalid">Invalid</option>
+                </select>
+            </th:block>
+            <p id="feedback" style="display: none; color: red;"> Must select supporting row(s)</p>
+        </div>
+    </section>
+
+    <!-- Function for showing answers -->
+    <script>
+        function myFunction() {
+            var x = document.getElementById("answers");
+            var y = document.getElementById("selections");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+            if (y.style.display === "none") {
+                y.style.display = "block";
+            } else {
+                y.style.display = "none";
+            }
+        }
+    </script>
+
+    <!-- Grading function-->
+    <script th:inline="javascript">
+        function grade() {
+            var count = /*[[${submit.getCount()}]]*/ 'default';
+            var list = /*[[${parsedQuestion.getResults()}]]*/ 'default';
+            var answer = /*[[${submit.getParsedAnswers()}]]*/ 'default';
+            var finalAnswer = /*[[${parsedQuestion.getFinalAnswer()}]]*/ 'default';
+            document.getElementById("feedback").style.display = "none";
+
+            // T/F table grading
+            for (let i = 0; i < count; i++) {
+                var x = document.getElementById(i);
+                console.log(x.value);
+                if (answer.charAt(i) != x.value && x.value != " ") {
+                    x.style.color = "red";
+                } else {
+                    x.style.color = "black";
+                }
+            }
+            // rightmost column grading
+            for (let i = 0; i < list.length; i++) {
+                var y = document.getElementById("valid" + i);
+                console.log("hey " + y.value);
+                console.log("is " + list[i].value);
+                if (list.charAt(i) != y.value) {
+                    y.style.color = "red";
+                } else {
+                    y.style.color = "black";
+                }
+            }
+            /* Final answer */
+            var z = document.getElementById("finalAnswer");
+            console.log("doc is" + z.value);
+
+            //This if statement verifies that the user has selected supporting
+            // rows for the final answer if required
+            if (z.value != " ") {
+                if (z.value == "contingent" || z.value == "not equivalent" ||
+                    z.value == "consistent" || z.value == "invalid") {
+                    
+                    /* Check if there is at least on T value in rightmost column */
+                    var oneTrue = false;
+                    for (let i = 0; i < list.length; i++) {
+                        y = document.getElementById("valid" + i);
+                        if (y.value == "T") {
+                            oneTrue = true;
+                        }
+                    }
+
+                    /* Check if there is at least on F value in rightmost column */
+                    if (z.value == "contingent") {
+                        var oneFalse = false;
+                        for (let i = 0; i < list.length; i++) {
+                            y = document.getElementById("valid" + i);
+                            if (y.value == "F") {
+                                oneFalse = true;
+                            }
+                        }
+                        if (!(oneTrue && oneFalse)) {
+                            document.getElementById("feedback").style.display = "inline";
+                            z.style.color = "red";
+                            return;
+                        }
+                    } else {
+                        if (!oneTrue) {
+                            document.getElementById("feedback").style.display = "inline";
+                            z.style.color = "red";
+                            return;
+                        }
+                    }
+                }
+                // Checks final answer
+                if (finalAnswer != z.value) {
+                    z.style.color = "red";
+                } else {
+                    z.style.color = "black";
+                }
+            }
+        }
+    </script>
+
+</body>
+<footer th:replace="fragments :: footer"></footer>
+
+</html>

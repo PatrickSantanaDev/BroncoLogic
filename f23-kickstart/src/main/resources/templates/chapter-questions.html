@@ -1,0 +1,279 @@
+<!DOCTYPE HTML>
+<html xmlns:th="https://www.thymeleaf.org">
+<head th:replace="fragments :: html_head">
+
+</head>
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="fragments :: menu"></div>
+<p> Here is the student view page for a given chapter </p>
+
+<section style="margin-top: 5%;" class="py-3 text-center container">
+    <div class="row py-0">
+        <div>
+            <h1>Interactive Truth Table</h1>
+            <p></p>
+            <p class="lead text-muted">
+                On this View, we will show a dropdown display of each question. Upon picking that specific problem,
+                the page will be populated with a template of the practice problem page (of course pertaining to that
+                question)
+            </p>
+        </div>
+    </div>
+
+
+    <h3 th:text="'Here are your questions for Chapter ' + ${chapter}"/>
+
+        <th:block th:each="questionNumber: ${#numbers.sequence(0, listOfQuestions.size() -1) }">
+
+
+                <h6 th:text=" ${listOfQuestions.get(questionNumber)}" th:onclick="'toggle123(' +  ${questionNumber} + ')'"></h6>
+
+
+
+
+            <main role="main"  th:id="'questionBox' + ${questionNumber}" style="display: none">
+                <div class="row">
+                    <div class="col-xl-auto mx-auto">
+                        <!-- Putting tables into columns -->
+                        <div class="row">
+                            <div class="col-sm">
+                                <!-- Center text in columns -->
+                                <table class="tablecenterheadCSS tablecenterCSS table caption-top">
+                                    <caption>Inputs</caption>
+                                    <thead>
+                                    <!-- print the input chars -->
+                                    <th:block th:each="char : ${inputChars.get(questionNumber).toCharArray()}">
+                                        <th th:text="${char}"></th>
+                                    </th:block>
+                                    </thead>
+                                    <!-- print the input values -->
+                                    <th:block th:each="i: ${#numbers.sequence(1, boxDepth.get(questionNumber))}">
+                                        <tr class="tablecenterCSS">
+                                            <!-- need to figure out how to set specific height like for other columns -->
+                                            <th:block
+                                                    th:each="j : ${#numbers.sequence(1, inputChars.get(questionNumber).length())}">
+                                                <td>
+                                                    <div style="height:25px"
+                                                         th:text="${prefilled.get(questionNumber).charAt( i * inputChars.get(questionNumber).length() - inputChars.get(questionNumber).length() + j - 1)}"></div>
+                                                </td>
+                                            </th:block>
+                                        </tr>
+                                    </th:block>
+                                </table>
+                            </div>
+                            <div id="selections" style="display: block;" class="col-sm">
+                                <table class="tablecenterheadCSS dropdowntable table caption-top">
+                                    <caption>Statement</caption>
+                                    <thead>
+                                    <!-- print the input statement -->
+                                    <!-- MAY NEED TO CHANGE LATER -->
+
+                                    <th:block th:each="pair: ${parsedQuestion.get(questionNumber).getResultList()}">
+                                        <th th:text="${pair.getValue0()}">
+                                    </th:block>
+                                    </thead>
+                                    <!-- print the test, use a switch to display this later -->
+
+                                    <!-- print the select boxes -->
+                                    <th:block th:each="i: ${#numbers.sequence(0, boxDepth.get(questionNumber) -1)}">
+                                        <tr class="tablecenterCSS">
+
+                                            <!-- print the question values -->
+                                            <th:block
+                                                    th:each="pair: ${parsedQuestion.get(questionNumber).getResultList()}">
+                                                <th:block th:if="${pair.getValue1().length() != 0}">
+                                                    <td>
+                                                        <div style="height:25px">
+                                                            <select th:id="${submit.get(questionNumber).getCount()}"
+                                                                    class="selectTF">
+                                                                <option value=" "></option>
+                                                                <option value="T">T</option>
+                                                                <option value="F">F</option>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                </th:block>
+                                                <th:block th:if="${pair.getValue1().length() == 0}">
+                                                    <td>
+                                                        <div style="height:25px"></div>
+                                                    </td>
+                                                </th:block>
+                                            </th:block>
+                                        </tr>
+                                    </th:block>
+
+                                </table>
+                            </div>
+
+                            <div id="answers" style="display:none" class="col-sm">
+                                <table class="tablecenterheadCSS dropdowntable table caption-top">
+                                    <caption>Answers</caption>
+                                    <thead>
+                                    <!-- print the input statement -->
+                                    <!-- MAY NEED TO CHANGE LATER -->
+
+                                    <th:block th:each="pair: ${parsedQuestion.get(questionNumber).getResultList()}">
+                                        <th th:text="${pair.getValue0()}">
+                                    </th:block>
+                                    </thead>
+                                    <!-- print the test, use a switch to display this later -->
+                                    <th:block th:each="i: ${#numbers.sequence(0, boxDepth.get(questionNumber) -1)}">
+                                        <tr class="tablecenterCSS">
+
+                                            <!-- print the question values -->
+                                            <th:block
+                                                    th:each="pair: ${parsedQuestion.get(questionNumber).getResultList()}">
+                                                <th:block th:if="${pair.getValue1().length() != 0}">
+                                                    <td>
+                                                        <div style="height:25px"
+                                                             th:text="${pair.getValue1().charAt(i)}"></div>
+                                                    </td>
+                                                </th:block>
+                                                <th:block th:if="${pair.getValue1().length() == 0}">
+                                                    <td>
+                                                        <div style="height:25px"></div>
+                                                    </td>
+                                                </th:block>
+                                            </th:block>
+                                        </tr>
+                                    </th:block>
+                                </table>
+                            </div>
+                            <div class="col-sm-auto">
+                                <th:block th:if="${parsedQuestion.get(questionNumber).isConsistency()}">
+                                    <table class="tablecenterheadCSS dropdowntable table caption-top">
+                                        <caption>Consistency Test</caption>
+                                        <thead>
+                                        <th style="text-align: center"
+                                            th:colspan="${inputChars.get(questionNumber).length()}">
+                                            Shows Consistency?
+                                        </th>
+                                        </thead>
+                                        <!-- print the select boxes -->
+                                        <th:block th:each="i: ${#numbers.sequence(1, boxDepth.get(questionNumber))}">
+                                            <tr class="tablecenterCSS">
+                                                <td>
+                                                    <div style="height:25px">
+                                                        <select th:id="'valid' + ${submit.get(questionNumber).getCount2()}"
+                                                                class="practiceDropdown">
+                                                            <option value=" "></option>
+                                                            <option value="T">Shows Consistent</option>
+                                                            <option value="F">Shows Inconsistent</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </th:block>
+                                    </table>
+                                </th:block>
+                            </div>
+                            <div class="col-sm-auto">
+                                <th:block th:if="${parsedQuestion.get(questionNumber).isArgument()}">
+                                    <table class="tablecenterheadCSS dropdowntable table caption-top">
+                                        <caption>Validity Test</caption>
+                                        <thead>
+                                        <th style="text-align: center"
+                                            th:colspan="${inputChars.get(questionNumber).length()}">
+                                            Row Shows?
+                                        </th>
+                                        </thead>
+                                        <!-- print the select boxes -->
+                                        <th:block th:each="i: ${#numbers.sequence(1, boxDepth.get(questionNumber))}">
+                                            <tr class="tablecenterCSS">
+                                                <td>
+                                                    <div style="height:25px">
+                                                        <select th:id="'valid' + ${submit.get(questionNumber).getCount2()}"
+                                                                class="practiceDropdown">
+                                                            <option value=" "></option>
+                                                            <option value="T">Valid</option>
+                                                            <option value="F">Invalid</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </th:block>
+                                    </table>
+                                </th:block>
+                            </div>
+                            <div class="col-sm-auto">
+                                <th:block th:if="${parsedQuestion.get(questionNumber).isLogical()}">
+                                    <table class="tablecenterheadCSS dropdowntable table caption-top">
+                                        <caption>Logical Status</caption>
+                                        <thead>
+                                        <th style="text-align: center"
+                                            th:colspan="${inputChars.get(questionNumber).length()}">
+                                            Row Shows?
+                                        </th>
+                                        </thead>
+                                        <!-- print the select boxes -->
+                                        <th:block th:each="i: ${#numbers.sequence(1, boxDepth.get(questionNumber))}">
+                                            <tr class="tablecenterCSS">
+                                                <td>
+                                                    <div style="height:25px">
+                                                        <select th:id="'valid' + ${submit.get(questionNumber).getCount2()}"
+                                                                class="practiceDropdown">
+                                                            <option value=" "></option>
+                                                            <option value="T">Not Tautology</option>
+                                                            <option value="F">Not Contradiction</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </th:block>
+                                    </table>
+                                </th:block>
+                            </div>
+                            <div class="col-sm-auto">
+                                <th:block th:if="${parsedQuestion.get(questionNumber).isEquivalence()}">
+                                    <table class="tablecenterheadCSS dropdowntable table caption-top">
+                                        <caption>Equivalence</caption>
+                                        <thead>
+                                        <th style="text-align: center"
+                                            th:colspan="${inputChars.get(questionNumber).length()}">
+                                            Row Shows?
+                                        </th>
+                                        </thead>
+                                        <!-- print the select boxes -->
+                                        <th:block th:each="i: ${#numbers.sequence(1, boxDepth.get(questionNumber))}">
+                                            <tr class="tablecenterCSS">
+                                                <td>
+                                                    <div style="height:25px">
+                                                        <select th:id="'valid' + ${submit.get(questionNumber).getCount2()}"
+                                                                class="practiceDropdown">
+                                                            <option value=" "></option>
+                                                            <option value="T">Equivalent</option>
+                                                            <option value="F">Not Equivalent</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </th:block>
+                                    </table>
+                                </th:block>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </th:block>
+</section>
+
+
+<footer th:replace="fragments :: footer"></footer>
+<script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function toggle123(id) {
+        console.log(id);
+        var cont = document.getElementById('questionBox' + id);
+        if (cont.style.display === 'block') {
+            cont.style.display = 'none';
+            console.log(id + ' none');
+        }
+        else {
+            cont.style.display = 'block';
+            console.log(id + 'block');
+        }
+    }
+</script>
+</body>
